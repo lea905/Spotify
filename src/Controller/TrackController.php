@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use App\Form\TrackType;
 use App\Service\AuthSpotifyService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,25 +25,35 @@ class TrackController extends AbstractController
     #[Route('/', name: 'app_track_index')]
     public function index(Request $request): Response
     {
-        $query = $request->query->get('q', 'booba');
-        if (empty($query)) {
-            $query = 'booba';
-        }
 
-        $response = $this->httpClient->request('GET', 'https://api.spotify.com/v1/search?query=' . urlencode($query) . '&type=track&local=fr-FR', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token,
-            ]
+        $form = $this->createForm(TrackType::class, null, [
+            'method' => 'GET',
+            'csrf_protection' => false,
         ]);
 
-        $data = json_decode($response->getContent(), true);
-        $tracks = $data['tracks']['items'];
+        $form->handleRequest($request);
 
-        dump($tracks);
+        $tracks = [];
+        $query = null;
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $query = $data['recherche'];
+
+            $response = $this->httpClient->request('GET', 'https://api.spotify.com/v1/search?query=' . $query . '&type=track&local=fr-FR', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token,
+                ]
+            ]);
+
+            $data = json_decode($response->getContent(), true);
+            $tracks = $data['tracks']['items'];
+        }
 
         return $this->render('track/index.html.twig', [
             'tracks' => $tracks,
             'query' => $query,
+            'form' => $form->createView(),
         ]);
     }
 

@@ -1,34 +1,28 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-    <!--transformer en fomulaire symfony-->
-<form action="{{ path('app_track_index') }}" method="get" class="input-group mb-4">
-    <div class="form-outline">
-        <input
-                type="search"
-                id="form1"
-                name="q"
-                class="form-control"
-                value="{{ query|default('') }}"
-                placeholder="Rechercher un artiste ou un titre" />
-    </div>
-    <button type="submit" class="btn btn-primary">
-        <i class="fas fa-search"></i>
-    </button>
-</form>
 
-<div class="row">
-    {% for track in tracks %}
-        <div class="col-md-4 mb-3">
-            <a href="{{ path('app_track_show', {'id': track.id}) }}" class="text-decoration-none text-dark">
-            <div class="card">
-                <img src="{{ track.album.images[0].url }}" class="card-img-top" alt="{{ track.name }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ track.name }}</h5>
-                    <p class="card-text">{{ track.artists[0].name }}</p>
-                </div>
-            </div>
-            </a>
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+            {{ form_start(form, {'method': 'get', 'attr': {'class': 'input-group'}}) }}
+            {{ form_widget(form.recherche, {'attr': {'placeholder': 'Rechercher un artiste ou un titre', 'class': 'form-control'}}) }}
+            {{ form_widget(form.btn, {'attr': {'class': 'btn btn-spotify'}}) }}
+            {{ form_end(form) }}
         </div>
-    {% endfor %}
-</div>
+    </div>
+
+    <div class="row">
+        {% for track in tracks %}
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                <a href="{{ path('app_track_show', {'id': track.id}) }}" class="text-decoration-none text-dark">
+                    <div class="card position-relative overflow-hidden">
+                        <img src="{{ track.album.images[0].url }}" class="card-img-top"  alt="{{ track.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title truncate">{{ track.name }}</h5>
+                            <p class="card-text truncate ">{{ track.artists[0].name }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
