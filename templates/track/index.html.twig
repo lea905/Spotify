@@ -3,10 +3,7 @@
 
     <div class="row justify-content-center mb-4">
         <div class="col-md-6">
-            {{ form_start(form, {'method': 'get', 'attr': {'class': 'input-group'}}) }}
-            {{ form_widget(form.recherche, {'attr': {'placeholder': 'Rechercher un artiste ou un titre', 'class': 'form-control'}}) }}
-            {{ form_widget(form.btn, {'attr': {'class': 'btn btn-spotify'}}) }}
-            {{ form_end(form) }}
+            {{ render(path('app_include_search_form')) }}
         </div>
     </div>
 
@@ -15,7 +12,9 @@
             <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
                 <a href="{{ path('app_track_show', {'id': track.id}) }}" class="text-decoration-none text-dark">
                     <div class="card position-relative overflow-hidden">
-                        <img src="{{ track.album.images[0].url }}" class="card-img-top"  alt="{{ track.name }}">
+                        {% if track.album.images is defined and track.album.images|length > 0 %}
+                            <img src="{{ track.album.images[0].url }}" class="card-img-top" alt="{{ track.name }}">
+                        {% endif %}
                         <div class="card-body">
                             <h5 class="card-title truncate">{{ track.name }}</h5>
                             <p class="card-text truncate ">{{ track.artists[0].name }}</p>
@@ -25,4 +24,5 @@
             </div>
         {% endfor %}
     </div>
+
 {% endblock %}

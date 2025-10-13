@@ -1,8 +1,10 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Track;
 use App\Form\TrackType;
 use App\Service\AuthSpotifyService;
+use App\Service\TrackService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,63 +17,30 @@ class TrackController extends AbstractController
 {
 
     private string $token;
-    private $httpClient;
-
-    public function __construct(private readonly AuthSpotifyService $authSpotifyService, HttpClientInterface $httpClient){
+    public function __construct(
+        private readonly AuthSpotifyService    $authSpotifyService,
+        private readonly TrackService $spotifyRequestService
+    ){
         $this->token = $this->authSpotifyService->auth();
-        $this->httpClient = $httpClient;
     }
 
-    #[Route('/', name: 'app_track_index')]
-    public function index(Request $request): Response
+    #[Route('/{search?}', name: 'app_track_index')]
+    public function index(string $search = null ): Response
     {
-
-        $form = $this->createForm(TrackType::class, null, [
-            'method' => 'GET',
-            'csrf_protection' => false,
-        ]);
-
-        $form->handleRequest($request);
-
-        $tracks = [];
-        $query = null;
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $query = $data['recherche'];
-
-            $response = $this->httpClient->request('GET', 'https://api.spotify.com/v1/search?query=' . $query . '&type=track&local=fr-FR', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                ]
-            ]);
-
-            $data = json_decode($response->getContent(), true);
-            $tracks = $data['tracks']['items'];
-        }
 
         return $this->render('track/index.html.twig', [
-            'tracks' => $tracks,
-            'query' => $query,
-            'form' => $form->createView(),
+            'tracks' => $this->spotifyRequestService->searchTracks($search ?: "kazzey", $this->token),
+            'search' => $search,
         ]);
     }
 
 
 
-    #[Route('/{id}', name: 'app_track_show')]
+    #[Route('/show/{id}', name: 'app_track_show')]
     public function show(string $id): Response
     {
-        $response = $this->httpClient->request('GET', 'https://api.spotify.com/v1/tracks/' . $id, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token,
-            ]
-        ]);
-
-        $track = json_decode($response->getContent(), true);
-
         return $this->render('track/show.html.twig', [
-            'track' => $track,
+            'track' => $this->spotifyRequestService->getTrack($id, $this->token),
         ]);
 
     }
