@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+        <h2>Mes favoris</h2>
+        <div class="row">
+            {% for track in tracks %}
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="card position-relative overflow-hidden">
+                        <img src="{{ track.pictureLink }}" class="card-img-top" alt="{{ track.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title truncate">{{ track.name }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>Aucun track enregistré.</p>
+            {% endfor %}
+        </div>
+
+{% endblock %}
