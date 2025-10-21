@@ -1,30 +1,25 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 
-    <div class="row justify-content-center mb-4">
-        {{ render(path('app_include_search_form') ~ '?redirect=' ~ app.request.attributes.get('_route')) }}
-    </div>
-
-
+    <h2>Mes favoris</h2>
     <div class="row">
         {% for artist in artists %}
             <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-                <a href="{{ path('app_artist_show', {'id': artist.getSpotifyId()}) }}"
-                   class="text-decoration-none text-dark">
-                    <div class="card position-relative overflow-hidden">
-                        <img src="{{ artist.imageUrl }}" class="card-img-top " alt="{{ artist.name }}">
-                        <div class="card-body">
-                            <h5 class="card-title truncate">{{ artist.name }}</h5>
-                            <button class="btn btn-danger position-absolute top-0 end-0 m-2 rounded-circle like-btn"
-                                    data-id="{{ artist.spotifyId }}">
-                                <i class="bi bi-suit-heart"></i>
-                            </button>
-                        </div>
+                <div class="card position-relative overflow-hidden">
+                    <img src="{{ artist.imageUrl }}" class="card-img-top" alt="{{ artist.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title truncate">{{ artist.name }}</h5>
+                        <button class="btn btn-danger dislike-btn" data-id="{{ artist.spotifyId }}">
+                            Supprimer des favoris
+                        </button>
                     </div>
-                </a>
+                </div>
             </div>
+        {% else %}
+            <p>Aucun Artiste enregistré.</p>
         {% endfor %}
     </div>
+
 
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -32,7 +27,7 @@
                 <strong class="me-auto">Info</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <div class="toast-body text-black" id="toastBody">
+            <div class="toast-body" id="toastBody">
             </div>
         </div>
     </div>
@@ -41,25 +36,29 @@
         function showToast(message) {
             const toastEl = document.getElementById('liveToast');
             document.getElementById('toastBody').textContent = message;
-            const toast = new bootstrap.Toast(toastEl, { delay: 2000 }); // 2 secondes
+            const toast = new bootstrap.Toast(toastEl, { delay: 2000 });
             toast.show();
         }
 
-        document.querySelectorAll('.like-btn').forEach(btn => {
+        document.querySelectorAll('.dislike-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const artistId = this.dataset.id;
 
-                fetch('/artist/save/' + artistId, {
+                fetch('/artist/deleteFav/' + artistId, {
                     method: 'POST',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
                     .then(res => res.json())
-                    .then(data => showToast(data.message))
+                    .then(data => {
+                            showToast(data.message)
+                            //reload page
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    )
                     .catch(err => showToast("Erreur lors de l'enregistrement"));
             });
         });
     </script>
-
 
 {% endblock %}

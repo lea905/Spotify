@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div class="card mb-3">
+        <img src="{{ artist.imageUrl }}" class="card-img-top" alt="{{ artist.name }}">
+        <div class="card-body">
+            <h5 class="card-title">{{ artist.name }}</h5>
+        </div>
+    </div>
+{% endblock %}

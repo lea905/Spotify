@@ -33,4 +33,18 @@ class TrackService
         return $this->trackFactory->createFromSpotifyData($response->toArray());
     }
 
+    public function getRecommendations(string $spotifyId, string $token): array
+    {
+        $response = $this->httpClient->request('GET',
+            'https://api.spotify.com/v1/recommendations?seed_tracks=' . $spotifyId, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                ],
+            ]
+        );
+
+        return $this->trackFactory->createMultipleFromSpotifyData($response->toArray()['tracks']);
+    }
+
+
 }

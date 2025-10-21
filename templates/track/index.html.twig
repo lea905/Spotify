@@ -1,19 +1,26 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 
+    <div class="row justify-content-center mb-4">
+        {{ render(path('app_include_search_form', { redirect: app.request.attributes.get('_route') })) }}
+    </div>
+
+
     <div class="row">
         {% for track in tracks %}
             <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-                <div class="card position-relative overflow-hidden">
-                    <img src="{{ track.pictureLink }}" class="card-img-top" alt="{{ track.name }}">
-                    <div class="card-body">
-                        <h5 class="card-title truncate">{{ track.name }}</h5>
-                        <button class="btn btn-outline-primary position-absolute top-0 end-0 m-2 p-2 rounded-circle like-btn"
-                                data-id="{{ track.spotifyId }}">
-                            Like
-                        </button>
+                <a href="{{ path('app_track_show', {'id': track.getSpotifyId()}) }}" class="text-decoration-none text-dark">
+                    <div class="card position-relative overflow-hidden">
+                        <img src="{{ track.pictureLink }}" class="card-img-top" alt="{{ track.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title truncate">{{ track.name }}</h5>
+                            <button class="btn btn-danger position-absolute top-0 end-0 m-2 rounded-circle like-btn"
+                                    data-id="{{ track.spotifyId }}">
+                                <i class="bi bi-suit-heart"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         {% endfor %}
     </div>
@@ -24,7 +31,7 @@
                 <strong class="me-auto">Info</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <div class="toast-body" id="toastBody">
+            <div class="toast-body text-black" id="toastBody">
             </div>
         </div>
     </div>

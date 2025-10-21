@@ -3,11 +3,12 @@
 namespace App\Service;
 
 use App\Entity\Artist;
+use App\Factory\ArtistFactory;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ArtistService{
 
-    public function __construct(private HttpClientInterface $httpClient)
+    public function __construct(private HttpClientInterface $httpClient, private readonly ArtistFactory $artistFactory)
     {}
 
     public function searchArtists(string $artist, string $token): array
@@ -18,13 +19,7 @@ class ArtistService{
             ],
         ]);
 
-        $artists = [];
-
-        foreach ($response->toArray()['artists']['items'] as $artist) {
-            $artists[] = new Artist($artist);
-        }
-
-        return $artists;
+        return $this->artistFactory->createMultipleFromSpotifyData($response->toArray()['artists']['items']);
     }
 
     public function getArtist(string $spotifyId,string $token) : Artist
@@ -34,9 +29,8 @@ class ArtistService{
                 'Authorization' => 'Bearer ' . $token,
             ],
         ]);
-        $artist = new Artist($response->toArray());
 
-        return $artist;
+        return $this->artistFactory->createFromSpotifyData($response->toArray());
     }
 
 

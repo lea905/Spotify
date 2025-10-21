@@ -14,14 +14,22 @@ class IncludeController extends AbstractController
     #[Route('/search-form', name: 'app_include_search_form', methods: ['GET', 'POST'])]
     public function searchForm(Request $request): Response
     {
+
+        $redirect = $request->query->get('redirect');
+
         $form = $this->createForm(TrackType::class, null, [
-            'action' => $this->generateUrl('app_include_search_form'),
+            'action' => $this->generateUrl('app_include_search_form', ['redirect' => $redirect]),
             'method' => 'POST',
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
+
+            if ($redirect === 'app_artist_index') {
+                return $this->redirectToRoute('app_artist_index', ['search' => $data['recherche']]);
+            }
+
             return $this->redirectToRoute('app_track_index', ['search' => $data['recherche']]);
         }
 
@@ -29,4 +37,5 @@ class IncludeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 }

@@ -9,6 +9,9 @@
                         <img src="{{ track.pictureLink }}" class="card-img-top" alt="{{ track.name }}">
                         <div class="card-body">
                             <h5 class="card-title truncate">{{ track.name }}</h5>
+                            <button class="btn btn-danger dislike-btn" data-id="{{ track.spotifyId }}">
+                                Supprimer des favoris
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -16,5 +19,45 @@
                 <p>Aucun track enregistré.</p>
             {% endfor %}
         </div>
+
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Info</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body text-black" id="toastBody">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showToast(message) {
+            const toastEl = document.getElementById('liveToast');
+            document.getElementById('toastBody').textContent = message;
+            const toast = new bootstrap.Toast(toastEl, { delay: 2000 });
+            toast.show();
+        }
+
+        document.querySelectorAll('.dislike-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const trackId = this.dataset.id;
+
+                fetch('/track/deleteFav/' + trackId, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        showToast(data.message)
+                        //reload page
+                        setTimeout(() => location.reload(), 1000);
+                        }
+                    )
+                    .catch(err => showToast("Erreur lors de l'enregistrement"));
+            });
+        });
+    </script>
 
 {% endblock %}

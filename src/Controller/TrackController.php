@@ -51,8 +51,10 @@ class TrackController extends AbstractController
     #[Route('/show/{id}', name: 'app_track_show')]
     public function show(string $id): Response
     {
+        $track = $this->spotifyRequestService->getTrack($id, $this->token);
+
         return $this->render('track/show.html.twig', [
-            'track' => $this->spotifyRequestService->getTrack($id, $this->token),
+            'track' => $track,
         ]);
 
     }
@@ -71,7 +73,19 @@ class TrackController extends AbstractController
         $entityManager->persist($track);
         $entityManager->flush();
 
-        return $this->json(['message' => 'Le track a été enregistré !']);
+        return $this->json(['message' => 'La musique a été enregistré !']);
+    }
+
+    #[Route('/deleteFav/{id}', name: 'app_track_deleteFav')]
+    public function deleteSpotifyData(EntityManagerInterface $entityManager, string $id): Response
+    {
+        $track = $entityManager->getRepository(Track::class)
+            ->findOneBy(['spotifyId' => $id]);
+
+        $entityManager->remove($track);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'La musique a été supprimé des favoris !']);
     }
 
 
