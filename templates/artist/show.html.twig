@@ -3,9 +3,16 @@
 {% block body %}
 
     <div class="card mb-3">
-        <img src="{{ artist.imageUrl }}" class="card-img-top" alt="{{ artist.name }}">
+        <img src="{{ artist.imageUrl }}" class="card-img-top w-25" alt="{{ artist.name }}">
         <div class="card-body">
             <h5 class="card-title">{{ artist.name }}</h5>
+            <p>{{ artist.followers }} Followers</p>
+            <div>
+            <p>Genre musical :</p>
+            {% for genres in artist.genres %}
+            {{ genres }}
+            {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}

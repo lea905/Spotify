@@ -6,6 +6,7 @@ use App\Entity\Track;
 use App\Form\TrackType;
 use App\Service\AuthSpotifyService;
 use App\Service\TrackService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

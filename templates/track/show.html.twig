@@ -3,9 +3,10 @@
 {% block body %}
 
     <div class="card mb-3">
-        <img src="{{ track.pictureLink }}" class="card-img-top" alt="{{ track.name }}">
+        <img src="{{ track.pictureLink }}" class="card-img-top w-25" alt="{{ track.name }}">
         <div class="card-body">
             <h5 class="card-title">{{ track.name }}</h5>
+            <p>Durée : {{ (track.durationMs / 60000)|number_format(2) }} min </p>
         </div>
     </div>
 {% endblock %}

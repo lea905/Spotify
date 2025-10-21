@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Artist;
 use App\Service\ArtistService;
 use App\Service\AuthSpotifyService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,7 +65,7 @@ class ArtistController extends AbstractController
         $entityManager->persist($artists);
         $entityManager->flush();
 
-        return $this->json(['message' => 'L artiste a été enregistré !']);
+        return $this->json(['message' => 'Artiste a été enregistré !']);
     }
 
     #[Route('/deleteFav/{id}', name: 'app_artist_deleteFav')]
@@ -76,7 +77,7 @@ class ArtistController extends AbstractController
         $entityManager->remove($artist);
         $entityManager->flush();
 
-        return $this->json(['message' => 'L artiste a été supprimé des favoris !']);
+        return $this->json(['message' => 'Artiste a été supprimé des favoris !']);
     }
 
 }

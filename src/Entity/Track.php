@@ -61,12 +61,12 @@ class Track
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $pictureLink = null;
 
-//    #[ORM\ManyToMany(targetEntity: Artist::class, mappedBy: 'tracks')]
-//    private Collection $users;
+    #[ORM\ManyToMany(targetEntity: Artist::class, inversedBy: 'tracks')]
+    private Collection $artists;
 
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+
     }
 
     public function getId(): ?int

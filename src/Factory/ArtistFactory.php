@@ -16,7 +16,7 @@ class ArtistFactory{
             ->setName($data['name'] ?? '')
             ->setGenres($data['genres'] ?? [])
             ->setPopularity($data['popularity'] ?? 0)
-            ->setFollowers($data['popularity'] ?? 0)
+            ->setFollowers($data['followers']['total'] ?? 0)
             ->setImageUrl($data['images'][0]['url'] ?? null);
     }
 
