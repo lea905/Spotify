@@ -61,12 +61,12 @@ class Track
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $pictureLink = null;
 
-    #[ORM\ManyToMany(targetEntity: Artist::class, inversedBy: 'tracks')]
-    private Collection $artists;
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'favoriteTracks')]
+    private Collection $users;
 
     public function __construct()
     {
-
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -259,19 +259,19 @@ class Track
         return $this->users;
     }
 
-//    public function addUser(User $user): static
-//    {
-//        if (!$this->users->contains($user)) {
-//            $this->users->add($user);
-//        }
-//
-//        return $this;
-//    }
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+        }
 
-//    public function removeUser(User $user): static
-//    {
-//        $this->users->removeElement($user);
-//
-//        return $this;
-//    }
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        $this->users->removeElement($user);
+
+        return $this;
+    }
 }

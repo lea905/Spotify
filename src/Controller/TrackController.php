@@ -30,11 +30,14 @@ class TrackController extends AbstractController
 
     #[Route('/favoris', name: 'app_track_favoris')]
     public function favorisShow(EntityManagerInterface  $entityManager): Response{
-        $repository = $entityManager->getRepository(Track::class);
-        $tracks = $repository->findAll();
+
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
+        }
 
         return $this->render('track/favoris.html.twig', [
-            'tracks' => $tracks,
+            'tracks' => $user->getFavoriteTracks(),
         ]);
     }
 
@@ -62,32 +65,60 @@ class TrackController extends AbstractController
     #[Route('/save/{id}', name: 'app_track_save')]
     public function saveSpotifyData(EntityManagerInterface  $entityManager, string $id): Response
     {
+
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
+        }
+
         $track = $this->spotifyRequestService->getTrack($id, $this->token);
 
         $existingTrack = $entityManager->getRepository(Track::class)
             ->findOneBy(['spotifyId' => $track->getSpotifyId()]);
 
-        if ($existingTrack) {
-            return $this->json(['message' => 'Ce track est déjà enregistré !']);
+        if (!$existingTrack) {
+            $entityManager->persist($track);
+            $entityManager->flush();
+            $existingTrack = $track;
         }
 
-        $entityManager->persist($track);
+        if ($user->getFavoriteTracks()->contains($existingTrack)) {
+            return $this->json(['message' => 'Vous avez déjà ajouté ce titre à vos favoris !']);
+        }
+
+        $user->addFavoriteTrack($existingTrack);
+        $entityManager->persist($user);
         $entityManager->flush();
 
-        return $this->json(['message' => 'La musique a été enregistré !']);
+        return $this->json(['message' => 'La musique a été enregistrée !']);
     }
 
     #[Route('/deleteFav/{id}', name: 'app_track_deleteFav')]
     public function deleteSpotifyData(EntityManagerInterface $entityManager, string $id): Response
     {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
+        }
+
         $track = $entityManager->getRepository(Track::class)
             ->findOneBy(['spotifyId' => $id]);
 
-        $entityManager->remove($track);
+        if (!$track) {
+            return $this->json(['error' => 'Musique non trouvée'], 404);
+        }
+
+        if (!$user->getFavoriteTracks()->contains($track)) {
+            return $this->json(['message' => 'Cette musique n’est pas dans vos favoris.']);
+        }
+
+        $user->removeFavoriteTrack($track);
+        $entityManager->persist($user);
         $entityManager->flush();
 
-        return $this->json(['message' => 'La musique a été supprimé des favoris !']);
+        return $this->json(['message' => 'La musique a été supprimée de vos favoris !']);
     }
+
 
 
 

@@ -1,11 +1,11 @@
 body {
-    background :linear-gradient(135deg, #1DB954, #191414);
+    background: linear-gradient(135deg, #1DB954, #191414);
     color: white;
 }
 
-.card{
+.card {
     border-radius: 15px;
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(5px);
     transition: transform 0.3s;
 }
@@ -33,4 +33,16 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.artist-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.text-spotify{
+ color: #1DB954;
+}
+
 

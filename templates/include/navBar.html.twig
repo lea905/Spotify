@@ -1,25 +1,57 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_track_index') }}" ><i class="bi bi-spotify"></i></a>
+                    <a class="nav-link" href="{{ path('app_track_index') }}"><i class="bi bi-spotify"></i></a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ path('app_track_favoris') }}">Musiques favorite</a>
+                    <a class="nav-link" href="{{ path('app_track_index') }}">Musiques</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('app_artist_index') }}">Artistes</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_artist_favoris') }}">Artistes favorite</a>
-                </li>
 
-
+                {% if app.user %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Mes favoris
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('app_artist_favoris') }}">Mes artistes</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_track_favoris') }}">Mes musiques</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
             </ul>
+
+            <ul class="navbar-nav">
+
+                {% if app.user %}
+                    <li class="nav-item">
+                        <span class="nav-link">{{ app.user.email }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_register') }}">Créer un compte</a>
+                    </li>
+                {% endif %}
+            </ul>
+
         </div>
     </div>
 </nav>

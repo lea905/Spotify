@@ -11,13 +11,15 @@
             <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
                 <a href="{{ path('app_track_show', {'id': track.getSpotifyId()}) }}" class="text-decoration-none text-dark">
                     <div class="card position-relative overflow-hidden">
-                        <img src="{{ track.pictureLink }}" class="card-img-top" alt="{{ track.name }}">
+                        <img src="{{ track.pictureLink }}" class="card-img-top artist-img" alt="{{ track.name }}">
                         <div class="card-body">
                             <h5 class="card-title truncate">{{ track.name }}</h5>
+                            {% if app.user %}
                             <button class="btn btn-danger position-absolute top-0 end-0 m-2 rounded-circle like-btn"
                                     data-id="{{ track.spotifyId }}">
                                 <i class="bi bi-suit-heart"></i>
                             </button>
+                            {% endif %}
                         </div>
                     </div>
                 </a>

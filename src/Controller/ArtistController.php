@@ -25,11 +25,14 @@ class ArtistController extends AbstractController
 
     #[Route('/favoris', name: 'app_artist_favoris')]
     public function favorisShow(EntityManagerInterface  $entityManager): Response{
-        $repository = $entityManager->getRepository(Artist::class);
-        $artists = $repository->findAll();
+
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
+        }
 
         return $this->render('artist/favoris.html.twig', [
-            'artists' => $artists,
+            'artists' => $user->getFavoriteArtists(),
         ]);
     }
 
@@ -37,7 +40,7 @@ class ArtistController extends AbstractController
     public function index(string $search = null): Response
     {
         return $this->render('artist/index.html.twig', [
-            'artists' => $this->spotifyRequestService->searchArtists($search ?: "Soprano", $this->token),
+            'artists' => $this->spotifyRequestService->searchArtists($search ?: "Lady gaga", $this->token),
             'search' => $search,
         ]);
     }
@@ -51,33 +54,57 @@ class ArtistController extends AbstractController
     }
 
     #[Route('/save/{id}', name: 'app_artist_save')]
-    public function saveSpotifyData(EntityManagerInterface  $entityManager, string $id): Response
+    public function saveSpotifyData(EntityManagerInterface $entityManager, string $id): Response
     {
-        $artists = $this->spotifyRequestService->getArtist($id, $this->token);
-
-        $existingTrack = $entityManager->getRepository(Artist::class)
-            ->findOneBy(['spotifyId' => $artists->getSpotifyId()]);
-
-        if ($existingTrack) {
-            return $this->json(['message' => 'Cet artiste est déjà enregistré !']);
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
         }
 
-        $entityManager->persist($artists);
+        $artist = $this->spotifyRequestService->getArtist($id, $this->token);
+
+        $existingArtist = $entityManager->getRepository(Artist::class)
+            ->findOneBy(['spotifyId' => $artist->getSpotifyId()]);
+
+        if (!$existingArtist) {
+            $entityManager->persist($artist);
+            $entityManager->flush();
+            $existingArtist = $artist;
+        }
+
+        if ($user->getFavoriteArtists()->contains($existingArtist)) {
+            return $this->json(['message' => 'Cet artiste est déjà dans vos favoris !']);
+        }
+
+        $user->addFavoriteArtist($existingArtist);
+        $entityManager->persist($user);
         $entityManager->flush();
 
-        return $this->json(['message' => 'Artiste a été enregistré !']);
+        return $this->json(['message' => 'Artiste ajouté à vos favoris !']);
     }
+
 
     #[Route('/deleteFav/{id}', name: 'app_artist_deleteFav')]
     public function deleteSpotifyData(EntityManagerInterface $entityManager, string $id): Response
     {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
+        }
+
         $artist = $entityManager->getRepository(Artist::class)
             ->findOneBy(['spotifyId' => $id]);
 
-        $entityManager->remove($artist);
+        if (!$artist) {
+            return $this->json(['error' => 'Artiste non trouvé'], 404);
+        }
+
+        $user->removeFavoriteArtist($artist);
+        $entityManager->persist($user);
         $entityManager->flush();
 
-        return $this->json(['message' => 'Artiste a été supprimé des favoris !']);
+        return $this->json(['message' => 'Artiste supprimé des favoris !']);
     }
+
 
 }
